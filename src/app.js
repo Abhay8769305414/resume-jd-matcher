@@ -3,11 +3,12 @@
  *
  * Responsibilities:
  *  - Configure Multer (memory storage, PDF-only filter, 10 MB limit)
- *  - Pre-parse all JDs on startup → cache for O(1) access per request
+ *  - Lazy-load JDs on first request (serverless-friendly)
  *  - Register routes:
- *      POST /api/match   → résumé upload & matching
- *      GET  /api/skills  → list all supported skills
- *      GET  /api/health  → simple liveness check
+ *      GET  /           → API info
+ *      POST /api/match  → résumé upload & matching
+ *      GET  /api/skills → list all supported skills
+ *      GET  /api/health → simple liveness check
  *  - Global error handler
  */
 
@@ -42,44 +43,38 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 } // 10 MB
 });
 
-// ─── JD Pre-Caching (runs once at startup) ───────────────────────────────────
-let parsedJDCache = [];
+// ─── Lazy JD Loading (serverless-friendly) ────────────────────────────────────
+let cachedJDs = null;
 
-try {
-  const jdsRaw = JSON.parse(
-    fs.readFileSync(path.join(__dirname, "./data/jds.json"), "utf-8")
-  );
+/**
+ * Loads and parses JDs on first call, caches for subsequent requests.
+ * Uses process.cwd() instead of __dirname for Vercel compatibility.
+ */
+function loadJDs() {
+  if (!cachedJDs) {
+    const filePath = path.join(process.cwd(), "src/data/jds.json");
+    const jdsRaw = JSON.parse(fs.readFileSync(filePath, "utf-8"));
 
-  /**
-   * parsedJDCache → Array of:
-   * {
-   *   jobId       : string,
-   *   role        : string,
-   *   aboutRole   : string,
-   *   requiredSkills: string[]
-   * }
-   */
-  parsedJDCache = jdsRaw.map(jd => {
-    const parsed = parseJD(jd.description, jd.jobId);
-    return {
-      jobId         : jd.jobId,
-      role          : jd.role,
-      aboutRole     : jd.aboutRole,
-      requiredSkills: parsed.requiredSkills
-    };
-  });
+    cachedJDs = jdsRaw.map(jd => {
+      const parsed = parseJD(jd.description, jd.jobId);
+      return {
+        jobId         : jd.jobId,
+        role          : jd.role,
+        aboutRole     : jd.aboutRole,
+        requiredSkills: parsed.requiredSkills
+      };
+    });
 
-  console.log(`✅  Pre-cached ${parsedJDCache.length} JDs on startup.`);
-} catch (err) {
-  console.error("⚠️  Failed to pre-cache JDs:", err.message);
+    console.log(`✅  Lazy-loaded ${cachedJDs.length} JDs.`);
+  }
+  return cachedJDs;
 }
-
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 
 /**
  * GET /
- * Root endpoint for Vercel discovery.
+ * Root endpoint — API info for Vercel discovery.
  */
 app.get("/", (req, res) => {
   res.json({
@@ -94,20 +89,19 @@ app.get("/", (req, res) => {
 
 /**
  * GET /api/health
- * Liveness check — useful in Docker / Kubernetes health probes.
+ * Fast liveness check — no heavy dependencies loaded.
  */
 app.get("/api/health", (req, res) => {
-  res.status(200).json({
-    status   : "ok",
-    timestamp: new Date().toISOString(),
-    cachedJDs: parsedJDCache.length
+  res.json({
+    status: "ok",
+    message: "Resume-JD Matcher API running",
+    timestamp: new Date().toISOString()
   });
 });
 
 /**
  * GET /api/skills
  * Returns every skill the system knows about.
- * Demonstrates API completeness to interviewers.
  */
 app.get("/api/skills", (req, res) => {
   res.status(200).json({
@@ -119,11 +113,12 @@ app.get("/api/skills", (req, res) => {
 /**
  * POST /api/match
  * Accepts a PDF résumé (field name: "resume") and returns match results.
+ * JDs are lazy-loaded on first call.
  */
 app.post(
   "/api/match",
   upload.single("resume"),
-  (req, res, next) => matchResume(req, res, next, parsedJDCache)
+  (req, res, next) => matchResume(req, res, next, loadJDs())
 );
 
 // ─── Global Error Handler ─────────────────────────────────────────────────────
