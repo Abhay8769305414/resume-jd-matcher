@@ -1,0 +1,32 @@
+[
+  {
+    "jobId": "JD001",
+    "role": "Backend Developer",
+    "aboutRole": "Build and maintain scalable RESTful APIs and microservices for our core platform. You will work with Java, Spring Boot, and Kafka in a cloud-native AWS environment.",
+    "description": "We are looking for an experienced Backend Developer with expertise in Java and Spring Boot. The candidate should have hands-on experience with Kafka for event-driven architectures, REST API design, microservices, Docker, and Kubernetes. Knowledge of MySQL and AWS is required. Experience with Jenkins for CI/CD pipelines is a plus. Git version control and Linux environment experience expected."
+  },
+  {
+    "jobId": "JD002",
+    "role": "Frontend Developer",
+    "aboutRole": "Design and implement modern web interfaces using React and TypeScript. Collaborate with UI/UX designers and backend engineers to deliver seamless user experiences.",
+    "description": "Seeking a skilled Frontend Developer proficient in React and TypeScript. The ideal candidate has experience with Angular or Vue, REST API integration, and Git workflow. Familiarity with Node.js and GraphQL is advantageous. You should be comfortable working in an Agile/Scrum environment and have strong knowledge of modern JavaScript."
+  },
+  {
+    "jobId": "JD003",
+    "role": "DevOps Engineer",
+    "aboutRole": "Manage and automate our cloud infrastructure on AWS and Azure. Own the CI/CD pipeline lifecycle and ensure platform reliability.",
+    "description": "We need a DevOps Engineer with strong hands-on experience in Docker and Kubernetes. Required skills include Terraform for infrastructure-as-code, Jenkins for CI/CD, and Linux system administration. Experience with AWS (EC2, S3, EKS) or Azure is mandatory. Knowledge of Kafka, Git, and monitoring tools like Elasticsearch is a plus."
+  },
+  {
+    "jobId": "JD004",
+    "role": "Data Engineer",
+    "aboutRole": "Build robust data pipelines and ETL workflows using Python and Spark. Work closely with data scientists to enable ML-ready datasets at scale.",
+    "description": "Looking for a Data Engineer experienced in Python, Pandas, and NumPy. You will design and manage Spark and Hadoop-based data pipelines. Knowledge of Kafka for streaming data ingestion, PostgreSQL, MongoDB, and Redis for storage is expected. Familiarity with machine learning and deep learning workflows is a plus. AWS or GCP cloud experience preferred."
+  },
+  {
+    "jobId": "JD005",
+    "role": "Full Stack Developer",
+    "aboutRole": "Own features end-to-end from database design to pixel-perfect UI. Join a fast-paced startup team shipping product weekly.",
+    "description": "Full Stack Developer needed with proficiency in React (frontend) and Node.js or Java (backend). You should understand REST API design, GraphQL, MongoDB, MySQL, and microservices architecture. Experience with Docker, Git, and TypeScript is required. Familiarity with AWS or GCP deployment and CI/CD pipelines (Jenkins) is a strong plus. Agile team experience valued."
+  }
+]
