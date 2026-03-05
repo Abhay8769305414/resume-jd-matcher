@@ -43,30 +43,37 @@ const upload = multer({
 });
 
 // ─── JD Pre-Caching (runs once at startup) ───────────────────────────────────
-const jdsRaw = JSON.parse(
-  fs.readFileSync(path.join(__dirname, "./data/jds.json"), "utf-8")
-);
+let parsedJDCache = [];
 
-/**
- * parsedJDCache → Array of:
- * {
- *   jobId       : string,
- *   role        : string,
- *   aboutRole   : string,
- *   requiredSkills: string[]
- * }
- */
-const parsedJDCache = jdsRaw.map(jd => {
-  const parsed = parseJD(jd.description, jd.jobId);
-  return {
-    jobId         : jd.jobId,
-    role          : jd.role,
-    aboutRole     : jd.aboutRole,
-    requiredSkills: parsed.requiredSkills
-  };
-});
+try {
+  const jdsRaw = JSON.parse(
+    fs.readFileSync(path.join(__dirname, "./data/jds.json"), "utf-8")
+  );
 
-console.log(`✅  Pre-cached ${parsedJDCache.length} JDs on startup.`);
+  /**
+   * parsedJDCache → Array of:
+   * {
+   *   jobId       : string,
+   *   role        : string,
+   *   aboutRole   : string,
+   *   requiredSkills: string[]
+   * }
+   */
+  parsedJDCache = jdsRaw.map(jd => {
+    const parsed = parseJD(jd.description, jd.jobId);
+    return {
+      jobId         : jd.jobId,
+      role          : jd.role,
+      aboutRole     : jd.aboutRole,
+      requiredSkills: parsed.requiredSkills
+    };
+  });
+
+  console.log(`✅  Pre-cached ${parsedJDCache.length} JDs on startup.`);
+} catch (err) {
+  console.error("⚠️  Failed to pre-cache JDs:", err.message);
+}
+
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 

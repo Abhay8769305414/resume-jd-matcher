@@ -13,7 +13,6 @@
  * Space Complexity: O(M) for the matched skill set
  */
 
-const pdf = require("pdf-parse");
 const cleanText = require("../utils/text.cleaner");
 const extractSalary = require("../utils/salary.extractor");
 const extractExperience = require("../utils/experience.extractor");
@@ -24,6 +23,8 @@ const skillDictionary = require("../utils/skill.dictionary");
  * @returns {Promise<{salary: string|null, yearOfExperience: number, resumeSkills: string[]}>}
  */
 async function parseResume(fileBuffer) {
+  // Lazy-load pdf-parse to avoid its test-PDF initialization bug in serverless environments
+  const pdf = require("pdf-parse");
   const data = await pdf(fileBuffer);
   const text = cleanText(data.text);
 
