@@ -71,6 +71,21 @@ console.log(`✅  Pre-cached ${parsedJDCache.length} JDs on startup.`);
 // ─── Routes ───────────────────────────────────────────────────────────────────
 
 /**
+ * GET /
+ * Root endpoint for Vercel discovery.
+ */
+app.get("/", (req, res) => {
+  res.json({
+    message: "Resume-JD Matcher API",
+    endpoints: {
+      health: "/api/health",
+      skills: "/api/skills",
+      match: "POST /api/match"
+    }
+  });
+});
+
+/**
  * GET /api/health
  * Liveness check — useful in Docker / Kubernetes health probes.
  */
